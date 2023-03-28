@@ -1,0 +1,59 @@
+Create Docker Image C++
+
+How to create docker image and docker file simple example for the C++ program?
+
+Sure, I can help you with that! Here's a simple example of how to create a Docker image for a C++ program using a Dockerfile.
+
+First, create a directory for your project and navigate to it:
+
+-----------------------
+mkdir my_cpp_project
+cd my_cpp_project
+Next, create your C++ program and save it as main.cpp in your project directory:
+
+-----------------------
+Copy code
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, world!" << std::endl;
+    return 0;
+}
+
+----------------------
+Create a Dockerfile in your project directory with the following contents:
+
+Copy code
+# Use an official Ubuntu runtime as a parent image
+FROM ubuntu:latest
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any needed packages
+RUN apt-get update && \
+    apt-get install -y g++
+
+# Compile the C++ program
+RUN g++ -o main main.cpp
+
+# Set the default command to run the executable
+CMD ["./main"]
+---------------------
+
+Build the Docker image by running the following command in your project directory:
+Copy code
+docker build -t my_cpp_image .
+---------------------
+
+Once the image is built, you can run a container from the image with the following command:
+
+---------------
+Copy code
+docker run my_cpp_image
+
+--------------
+You should see the output Hello, world! printed to the console. Congratulations, you've created a Docker image for your C++ program!
