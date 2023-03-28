@@ -1,0 +1,389 @@
+This assigenment is for how to patch for file or open source packages (or ports in FreeBSD).
+
+Similary, we can patch for open source packages (or ports in FreeBSD).
+There could be sligthly difference in Ubuntu and FreeBSD. However,
+most of the commands are identicals.
+
+Ready Makefile should be there for open source packages or ports for
+easy build, otherwise need to put efforts for creating Makefile.
+
+Here, we are using 'patch' command for file patching. also, we have
+used 'diff' command for support. and this is standard way to create
+and build the patches.
+
+detail steps:
+------------------
+1. go to location; i.e # cd <path/to/your/source/file>
+2. take copy of that file i.e. cp sample.c sample.c.orig
+3. edit file and save the file with new changes; i.e. vi sample.c
+4. then using 'diff' create patch file i.e. diff -buN sample.c.orig sample.c > patch-sample.c
+	*Note: patch file name can be anything.
+5. Build or Apply the patch using 'patch' (or Makefile if available) i.e.  patch < patch-sample.c
+	*Note: use option '-b' to take a backup before applying patch or for setting backup file version use '-V' option along with option '-b' i.e. # patch -b < patch-sample.c or # patch -b -V < patch-sample.c respectively..
+6. try to dry-run for created patch before applying, because if some errors are there in newly created patch then it will be risky is some cases. i.e patch --dry-run < patch-sample.c
+	*Note: Reverse/Undo a patch can be possible using # patch -R < patch-sample.c
+7. Once dry-run succeeded then can build and install patch (using Makefile).
+
+
+*Note:
+1. Always create Makefile. And of course, for real time projects Makefile will be there.
+
+
+
+
+
+Screen snapshot:
+______________________________________________________________________________________________
+ubuntu@ubuntu:~/Desktop/MyAssignment$ mkdir patch
+ubuntu@ubuntu:~/Desktop/MyAssignment$ cd patch/
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ vi readme
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat readme
+<same file will show here>
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ patch --help
+Usage: patch [OPTION]... [ORIGFILE [PATCHFILE]]
+
+Input options:
+
+  -p NUM  --strip=NUM  Strip NUM leading components from file names.
+  -F LINES  --fuzz LINES  Set the fuzz factor to LINES for inexact matching.
+  -l  --ignore-whitespace  Ignore white space changes between patch and input.
+
+  -c  --context  Interpret the patch as a context difference.
+  -e  --ed  Interpret the patch as an ed script.
+  -n  --normal  Interpret the patch as a normal difference.
+  -u  --unified  Interpret the patch as a unified difference.
+
+  -N  --forward  Ignore patches that appear to be reversed or already applied.
+  -R  --reverse  Assume patches were created with old and new files swapped.
+
+  -i PATCHFILE  --input=PATCHFILE  Read patch from PATCHFILE instead of stdin.
+
+Output options:
+
+  -o FILE  --output=FILE  Output patched files to FILE.
+  -r FILE  --reject-file=FILE  Output rejects to FILE.
+
+  -D NAME  --ifdef=NAME  Make merged if-then-else output using NAME.
+  --merge  Merge using conflict markers instead of creating reject files.
+  -E  --remove-empty-files  Remove output files that are empty after patching.
+
+  -Z  --set-utc  Set times of patched files, assuming diff uses UTC (GMT).
+  -T  --set-time  Likewise, assuming local time.
+
+  --quoting-style=WORD   output file names using quoting style WORD.
+    Valid WORDs are: literal, shell, shell-always, c, escape.
+    Default is taken from QUOTING_STYLE env variable, or 'shell' if unset.
+
+Backup and version control options:
+
+  -b  --backup  Back up the original contents of each file.
+  --backup-if-mismatch  Back up if the patch does not match exactly.
+  --no-backup-if-mismatch  Back up mismatches only if otherwise requested.
+
+  -V STYLE  --version-control=STYLE  Use STYLE version control.
+        STYLE is either 'simple', 'numbered', or 'existing'.
+  -B PREFIX  --prefix=PREFIX  Prepend PREFIX to backup file names.
+  -Y PREFIX  --basename-prefix=PREFIX  Prepend PREFIX to backup file basenames.
+  -z SUFFIX  --suffix=SUFFIX  Append SUFFIX to backup file names.
+
+  -g NUM  --get=NUM  Get files from RCS etc. if positive; ask if negative.
+
+Miscellaneous options:
+
+  -t  --batch  Ask no questions; skip bad-Prereq patches; assume reversed.
+  -f  --force  Like -t, but ignore bad-Prereq patches, and assume unreversed.
+  -s  --quiet  --silent  Work silently unless an error occurs.
+  --verbose  Output extra information about the work being done.
+  --dry-run  Do not actually change any files; just print what would happen.
+  --posix  Conform to the POSIX standard.
+
+  -d DIR  --directory=DIR  Change the working directory to DIR first.
+  --reject-format=FORMAT  Create 'context' or 'unified' rejects.
+  --binary  Read and write data in binary mode.
+  --read-only=BEHAVIOR  How to handle read-only input files: 'ignore' that they
+                        are read-only, 'warn' (default), or 'fail'.
+
+  -v  --version  Output version info.
+  --help  Output this help.
+
+Report bugs to <bug-patch@gnu.org>.
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ which patch
+/usr/bin/patch
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ apt info patch
+Package: patch
+Version: 2.7.6-6
+Priority: optional
+Build-Essential: yes
+Section: utils
+Origin: Ubuntu
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Original-Maintainer: Laszlo Boszormenyi (GCS) <gcs@debian.org>
+Bugs: https://bugs.launchpad.net/ubuntu/+filebug
+Installed-Size: 238 kB
+Depends: libc6 (>= 2.17)
+Suggests: ed, diffutils-doc
+Homepage: http://savannah.gnu.org/projects/patch/
+Task: server, ubuntu-desktop-minimal, ubuntu-desktop, cloud-image, xubuntu-desktop, lubuntu-desktop, ubuntustudio-desktop, ubuntukylin-desktop, ubuntu-mate-core, ubuntu-mate-desktop, ubuntu-budgie-desktop
+Download-Size: 105 kB
+APT-Manual-Installed: no
+APT-Sources: http://us.archive.ubuntu.com/ubuntu focal/main amd64 Packages
+Description: Apply a diff file to an original
+ Patch will take a patch file containing any of the four forms
+ of difference listing produced by the diff program and apply
+ those differences to an original file, producing a patched
+ version.
+
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ diff --help
+Usage: diff [OPTION]... FILES
+Compare FILES line by line.
+
+Mandatory arguments to long options are mandatory for short options too.
+      --normal                  output a normal diff (the default)
+  -q, --brief                   report only when files differ
+  -s, --report-identical-files  report when two files are the same
+  -c, -C NUM, --context[=NUM]   output NUM (default 3) lines of copied context
+  -u, -U NUM, --unified[=NUM]   output NUM (default 3) lines of unified context
+  -e, --ed                      output an ed script
+  -n, --rcs                     output an RCS format diff
+  -y, --side-by-side            output in two columns
+  -W, --width=NUM               output at most NUM (default 130) print columns
+      --left-column             output only the left column of common lines
+      --suppress-common-lines   do not output common lines
+
+  -p, --show-c-function         show which C function each change is in
+  -F, --show-function-line=RE   show the most recent line matching RE
+      --label LABEL             use LABEL instead of file name and timestamp
+                                  (can be repeated)
+
+  -t, --expand-tabs             expand tabs to spaces in output
+  -T, --initial-tab             make tabs line up by prepending a tab
+      --tabsize=NUM             tab stops every NUM (default 8) print columns
+      --suppress-blank-empty    suppress space or tab before empty output lines
+  -l, --paginate                pass output through 'pr' to paginate it
+
+  -r, --recursive                 recursively compare any subdirectories found
+      --no-dereference            don't follow symbolic links
+  -N, --new-file                  treat absent files as empty
+      --unidirectional-new-file   treat absent first files as empty
+      --ignore-file-name-case     ignore case when comparing file names
+      --no-ignore-file-name-case  consider case when comparing file names
+  -x, --exclude=PAT               exclude files that match PAT
+  -X, --exclude-from=FILE         exclude files that match any pattern in FILE
+  -S, --starting-file=FILE        start with FILE when comparing directories
+      --from-file=FILE1           compare FILE1 to all operands;
+                                    FILE1 can be a directory
+      --to-file=FILE2             compare all operands to FILE2;
+                                    FILE2 can be a directory
+
+  -i, --ignore-case               ignore case differences in file contents
+  -E, --ignore-tab-expansion      ignore changes due to tab expansion
+  -Z, --ignore-trailing-space     ignore white space at line end
+  -b, --ignore-space-change       ignore changes in the amount of white space
+  -w, --ignore-all-space          ignore all white space
+  -B, --ignore-blank-lines        ignore changes where lines are all blank
+  -I, --ignore-matching-lines=RE  ignore changes where all lines match RE
+
+  -a, --text                      treat all files as text
+      --strip-trailing-cr         strip trailing carriage return on input
+
+  -D, --ifdef=NAME                output merged file with '#ifdef NAME' diffs
+      --GTYPE-group-format=GFMT   format GTYPE input groups with GFMT
+      --line-format=LFMT          format all input lines with LFMT
+      --LTYPE-line-format=LFMT    format LTYPE input lines with LFMT
+    These format options provide fine-grained control over the output
+      of diff, generalizing -D/--ifdef.
+    LTYPE is 'old', 'new', or 'unchanged'.  GTYPE is LTYPE or 'changed'.
+    GFMT (only) may contain:
+      %<  lines from FILE1
+      %>  lines from FILE2
+      %=  lines common to FILE1 and FILE2
+      %[-][WIDTH][.[PREC]]{doxX}LETTER  printf-style spec for LETTER
+        LETTERs are as follows for new group, lower case for old group:
+          F  first line number
+          L  last line number
+          N  number of lines = L-F+1
+          E  F-1
+          M  L+1
+      %(A=B?T:E)  if A equals B then T else E
+    LFMT (only) may contain:
+      %L  contents of line
+      %l  contents of line, excluding any trailing newline
+      %[-][WIDTH][.[PREC]]{doxX}n  printf-style spec for input line number
+    Both GFMT and LFMT may contain:
+      %%  %
+      %c'C'  the single character C
+      %c'\OOO'  the character with octal code OOO
+      C    the character C (other characters represent themselves)
+
+  -d, --minimal            try hard to find a smaller set of changes
+      --horizon-lines=NUM  keep NUM lines of the common prefix and suffix
+      --speed-large-files  assume large files and many scattered small changes
+      --color[=WHEN]       colorize the output; WHEN can be 'never', 'always',
+                             or 'auto' (the default)
+      --palette=PALETTE    the colors to use when --color is active; PALETTE is
+                             a colon-separated list of terminfo capabilities
+
+      --help               display this help and exit
+  -v, --version            output version information and exit
+
+FILES are 'FILE1 FILE2' or 'DIR1 DIR2' or 'DIR FILE' or 'FILE DIR'.
+If --from-file or --to-file is given, there are no restrictions on FILE(s).
+If a FILE is '-', read standard input.
+Exit status is 0 if inputs are the same, 1 if different, 2 if trouble.
+
+Report bugs to: bug-diffutils@gnu.org
+GNU diffutils home page: <https://www.gnu.org/software/diffutils/>
+General help using GNU software: <https://www.gnu.org/gethelp/>
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ which diff
+/usr/bin/diff
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ apt info diff
+Package: diff
+State: not a real package (virtual)
+N: Can't select candidate version from package diff as it has no candidate
+N: Can't select versions from package 'diff' as it is purely virtual
+N: No packages found
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ vi sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat sample.c
+#include <stdio.h>
+
+int main()
+{
+        printf("this is original sample file\n");
+        return 0;
+}
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ gcc sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ ./a.out
+this is original sample file
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ ls
+a.out  readme  sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cp sample.c sample.c.orig
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ vi sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat sample.c
+#include <stdio.h>
+
+int main()
+{
+        printf("this is original sample file\n");
+        printf("this is the patch change\n");
+        return 0;
+}
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ diff -buN sample.c.orig  sample.c
+--- sample.c.orig       2022-07-20 10:23:39.404803482 -0700
++++ sample.c    2022-07-20 10:24:32.933250210 -0700
+@@ -3,5 +3,6 @@
+ int main()
+ {
+        printf("this is original sample file\n");
++       printf("this is the patch change\n");
+        return 0;
+ }
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ diff -buN sample.c.orig  sample.c > patch-sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat patch-sample.c
+--- sample.c.orig       2022-07-20 10:23:39.404803482 -0700
++++ sample.c    2022-07-20 10:24:32.933250210 -0700
+@@ -3,5 +3,6 @@
+ int main()
+ {
+        printf("this is original sample file\n");
++       printf("this is the patch change\n");
+        return 0;
+ }
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ ls -la
+total 44
+drwxrwxr-x 2 ubuntu ubuntu  4096 Jul 20 10:26 .
+drwxrwxr-x 6 ubuntu ubuntu  4096 Jul 20 09:43 ..
+-rwxrwxr-x 1 ubuntu ubuntu 16696 Jul 20 09:58 a.out
+-rw-rw-r-- 1 ubuntu ubuntu   233 Jul 20 10:25 patch-sample.c
+-rw-rw-r-- 1 ubuntu ubuntu   727 Jul 20 10:03 readme
+-rw-rw-r-- 1 ubuntu ubuntu   128 Jul 20 10:26 sample.c
+-rw-rw-r-- 1 ubuntu ubuntu   128 Jul 20 10:24 sample.c.orig
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ patch --dry-run < patch-sample.c
+checking file sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat sample.c
+#include <stdio.h>
+
+int main()
+{
+        printf("this is original sample file\n");
+        return 0;
+}
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ patch -b -V numbered < patch-sample.c
+patching file sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat sample.c
+#include <stdio.h>
+
+int main()
+{
+        printf("this is original sample file\n");
+        printf("this is the patch change\n");
+        return 0;
+}
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ ls -la
+total 48
+drwxrwxr-x 2 ubuntu ubuntu  4096 Jul 20 10:37 .
+drwxrwxr-x 6 ubuntu ubuntu  4096 Jul 20 09:43 ..
+-rwxrwxr-x 1 ubuntu ubuntu 16696 Jul 20 09:58 a.out
+-rw-rw-r-- 1 ubuntu ubuntu   233 Jul 20 10:25 patch-sample.c
+-rw-rw-r-- 1 ubuntu ubuntu   727 Jul 20 10:03 readme
+-rw-rw-r-- 1 ubuntu ubuntu   128 Jul 20 10:37 sample.c
+-rw-rw-r-- 1 ubuntu ubuntu    89 Jul 20 10:28 sample.c.~1~
+-rw-rw-r-- 1 ubuntu ubuntu   128 Jul 20 10:24 sample.c.orig
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ gcc sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ ./a.out
+this is original sample file
+this is the patch change
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ patch -R < patch-sample.c
+patching file sample.c
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$ cat sample.c
+#include <stdio.h>
+
+int main()
+{
+        printf("this is original sample file\n");
+        return 0;
+}
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+ubuntu@ubuntu:~/Desktop/MyAssignment/patch$
+
+
+
+Ref (Non official site there could be some ads): https://linuxhint.com/run-patch-command-in-linux/
+
+Todos:
+
+1. Create Makefile for sample.c build process and also, for building patch, installing patch, etc.
+
+Thanks
